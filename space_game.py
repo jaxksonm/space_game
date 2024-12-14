@@ -37,7 +37,7 @@ MIN_POS = 100
 font = pygame.font.SysFont('Arial', 30)
 score = 0
 # load images
-background = pygame.image.load(r"C:\Users\compu\OneDrive\Desktop\more_sprites\output-onlinepngtools.png")
+background = pygame.image.load(r"space_sprites\output-onlinepngtools.png")
 background = pygame.transform.scale(background,
                                     (WIDTH + 50, HEIGHT))  # slightly bigger than screen so scrolling will hide
 
@@ -49,8 +49,8 @@ class Rocket(pygame.sprite.Sprite):
         self.images = []
         self.index = 0
         self.counter = 0
-        self.image1 = pygame.image.load(r"C:\Users\compu\OneDrive\Desktop\more_sprites\ship001.png")
-        self.image2 = pygame.image.load(r"C:\Users\compu\OneDrive\Desktop\more_sprites\ship001.png")
+        self.image1 = pygame.image.load(r"space_sprites\ship001.png")
+        self.image2 = pygame.image.load(r"space_sprites\ship001.png")
         self.images.append(self.image1)
         self.images.append(self.image2)
         self.image = self.images[self.index]
@@ -88,7 +88,8 @@ class Rocket(pygame.sprite.Sprite):
         else:
             self.image = pygame.transform.rotate(self.images[self.index], 180)
             obstacle_group.empty()  # delete all obstacles
-            background_image = pygame.image.load(r"C:\Users\compu\OneDrive\Desktop\more_sprites\text-1734188492127.png")
+            background_image = pygame.image.load(
+                r"space_sprites\text-1734188492127.png")
             background_image = pygame.transform.scale(background_image, (700, 200))
             screen.blit(background_image, (WIDTH / 8, HEIGHT - 400))
 
@@ -102,13 +103,13 @@ class Obstacles(pygame.sprite.Sprite):
         self.random_number = random.randint(self.MIN, self.MAX)
         self.get_random_number = self.random_number
         # load obstacles
-        self.image1 = pygame.image.load(r"C:\Users\compu\OneDrive\Desktop\more_sprites\astreroid.png")
+        self.image1 = pygame.image.load(r"space_sprites\astreroid.png")
         self.image1 = pygame.transform.scale(self.image1, (50, 50))
 
-        self.image2 = pygame.image.load(r"C:\Users\compu\OneDrive\Desktop\more_sprites\asteroid2.png")
+        self.image2 = pygame.image.load(r"space_sprites\asteroid2.png")
         self.image2 = pygame.transform.scale(self.image2, (50, 50))
 
-        self.image3 = pygame.image.load(r"C:\Users\compu\OneDrive\Desktop\more_sprites\asteroid2.png")
+        self.image3 = pygame.image.load(r"space_sprites\asteroid2.png")
         self.image3 = pygame.transform.scale(self.image3, (self.get_random_number, self.get_random_number))
 
         # randomly get select generate an asteroid
@@ -142,7 +143,7 @@ class Blaster(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(
-            r"C:\Users\compu\Downloads\sprites_-_lasers_bullets_1_66v2.5\Laser Sprites\16.png")
+            r"space_sprites\16.png")
         self.image = pygame.transform.scale(self.image, (120, 50))
         self.rect = self.image.get_rect()
         self.hitbox = pygame.Rect(self.rect.centerx - 15, self.rect.centery - 15, 30, 30)
