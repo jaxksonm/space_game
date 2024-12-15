@@ -42,6 +42,19 @@ background = pygame.transform.scale(background,
                                     (WIDTH + 50, HEIGHT))  # slightly bigger than screen so scrolling will hide
 
 
+button_image = pygame.image.load(r"space_sprites/text-1734273102144.png")
+button_image = pygame.transform.scale(button_image, (200, 150))
+
+
+def reset_game():
+    obstacle_group.empty()
+    blaster_group.empty()
+    ship.rect.x = 50
+    ship.rect.y = int(HEIGHT / 2)
+    reset_score = 0
+    return reset_score
+
+
 # rocket class
 class Rocket(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -155,9 +168,26 @@ class Blaster(pygame.sprite.Sprite):
         self.hitbox.x = self.rect.x + (self.rect.width // 2) - (self.hitbox.width // 2)
         self.hitbox.y = self.rect.y + (self.rect.height // 2) - (self.hitbox.height // 2)
 
-        # Remove the blaster if it goes off-screen (to the right)
         if self.rect.left > WIDTH + 100:
             self.kill()
+
+
+class Button:
+    def __init__(self, x, y, image):
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x, y)
+
+    def draw(self):
+        action = False
+        # get mouse position
+        pos = pygame.mouse.get_pos()
+        if self.rect.collidepoint(pos):
+            if pygame.mouse.get_pressed()[0] == 1:
+                action = True
+
+        screen.blit(self.image, (self.rect.x, self.rect.y))
+        return action
 
 
 # game
@@ -167,6 +197,9 @@ rocket_group = pygame.sprite.Group()
 
 ship = Rocket(100, int(HEIGHT / 2))
 rocket_group.add(ship)
+
+# create restart button
+button = Button(WIDTH // 2 - 50, HEIGHT - 140, button_image)
 
 blaster_fired = False  # check if the blaster was shot
 run = True
@@ -229,6 +262,12 @@ while run:
         if abs(scroll) > 40:
             scroll = 0
         obstacle_group.update()
+
+    # check for game over and reset
+    if game_over:
+        if button.draw():
+            game_over = False
+            score = reset_game()
 
     for event in pygame.event.get():
         if event.type == QUIT:
