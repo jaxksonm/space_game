@@ -41,7 +41,6 @@ background = pygame.image.load(r"space_sprites/output-onlinepngtools.png")
 background = pygame.transform.scale(background,
                                     (WIDTH + 50, HEIGHT))  # slightly bigger than screen so scrolling will hide
 
-
 button_image = pygame.image.load(r"space_sprites/text-1734273102144.png")
 button_image = pygame.transform.scale(button_image, (200, 150))
 
@@ -185,7 +184,6 @@ class Button:
         if self.rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0] == 1:
                 action = True
-
         screen.blit(self.image, (self.rect.x, self.rect.y))
         return action
 
@@ -228,19 +226,23 @@ while run:
     blaster_group.update()
     blaster_group.draw(screen)
 
-    colliding_obstacle = pygame.sprite.spritecollideany(ship, obstacle_group)
+    # rocket collision with obstacles
+    rocket_collision = pygame.sprite.spritecollideany(ship, obstacle_group)
 
-    for blaster in blaster_group:
-        colliding_obstacle = pygame.sprite.spritecollideany(blaster, obstacle_group)
-        if colliding_obstacle:
-            if blaster.hitbox.colliderect(colliding_obstacle.hitbox):
-                blaster.kill()  # destroy blaster on collision
-                colliding_obstacle.kill()  # destroy obstacle on collision
-                score += 100  # increase player score by 100
-
-    if colliding_obstacle:
-        if ship.rect.colliderect(colliding_obstacle.hitbox):
+    if rocket_collision:
+        # Check if the rocket actually collides with the obstacle's hitbox
+        if ship.rect.colliderect(rocket_collision.hitbox):
             game_over = True
+
+    # blaster collision with obstacles
+    for blaster in blaster_group:
+        blaster_collision = pygame.sprite.spritecollideany(blaster, obstacle_group)
+        if blaster_collision:
+            # check if the blaster actually collides with the obstacle's hitbox
+            if blaster.hitbox.colliderect(blaster_collision.hitbox):
+                blaster.kill()  # destroy the blaster
+                blaster_collision.kill()  # destroy the obstacle
+                score += 100  # increase player score by 100
 
     if ship.rect.top + 50 < 0:
         game_over = True
@@ -294,3 +296,4 @@ pygame.quit()
 # new obstacle that destroys itself when the ship hits it
 # lives for the ship
 # add sound!
+# add a game menu
