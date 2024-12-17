@@ -4,7 +4,10 @@ import pygame
 from pygame.locals import *
 import random  # RNG 😡😡😡
 
-pygame.init()
+pygame.init()  # initialize pygame
+# game icon
+icon = pygame.image.load(r"space_sprites/ship001.png")
+pygame.display.set_icon(icon)  # set the icon
 
 clock = pygame.time.Clock()
 fps = 60  # game speed
@@ -12,10 +15,62 @@ fps = 60  # game speed
 # dimension vars
 WIDTH = 900
 HEIGHT = 600
+font = pygame.font.SysFont('Arial', 30)  # font for game
+font2 = pygame.font.SysFont('Courier', 60, bold=True)  # font for menu
 
 # screen size
 screen = pygame.display.set_mode((WIDTH, HEIGHT))  # window size
 pygame.display.set_caption('Space Shooter')
+
+
+def show_menu():
+    menu_running = True
+    while menu_running:
+        # load game background into menu
+        menu_background = pygame.image.load(r"space_sprites/output-onlinepngtools.png")
+        menu_background = pygame.transform.scale(menu_background, (WIDTH + 50, HEIGHT))
+        screen.blit(menu_background, (0, 0))  # display the menu
+
+        button_bg_color = (200, 200, 200)  # background color gray
+        text_color = (255, 255, 255)  # text color white
+
+        # text boxes
+        play_text = font2.render("PLAY", True, text_color)
+        quit_text = font2.render("QUIT", True, text_color)
+
+        # center the buttons
+        play_rect = play_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
+        quit_rect = quit_text.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
+
+        # add padding so that buttons are clickable in a box
+        play_bg_rect = play_rect.inflate(20, 10)
+        quit_bg_rect = quit_rect.inflate(20, 10)
+
+        # draw backgrounds
+        pygame.draw.rect(screen, button_bg_color, play_bg_rect, border_radius=5)
+        pygame.draw.rect(screen, button_bg_color, quit_bg_rect, border_radius=5)
+
+        # draw text
+        screen.blit(play_text, play_rect)
+        screen.blit(quit_text, quit_rect)
+
+        # event handling
+        for events in pygame.event.get():
+            if events.type == QUIT:
+                pygame.quit()
+                exit()
+            if events.type == MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                # if the user clicks play, play again
+                if play_bg_rect.collidepoint(mouse_pos):
+                    menu_running = False
+
+                if quit_bg_rect.collidepoint(mouse_pos):
+                    pygame.quit()
+                    exit()
+
+        pygame.display.update()
+
 
 try:  # try to open the file and read the highscore
     with open("highscore.txt", "r") as file:
@@ -34,8 +89,8 @@ blaster_delay = 800  # set the blaster delay in ms
 last_blaster = pygame.time.get_ticks() - blaster_delay
 MAX_POS = 500
 MIN_POS = 100
-font = pygame.font.SysFont('Arial', 30)
-score = 0
+game_paused = False
+score = 0  # set score to 0
 # load images
 background = pygame.image.load(r"space_sprites/output-onlinepngtools.png")
 background = pygame.transform.scale(background,
@@ -46,10 +101,16 @@ button_image = pygame.transform.scale(button_image, (200, 150))
 
 
 def reset_game():
+    # empty obstacle groups
     obstacle_group.empty()
     blaster_group.empty()
+
+    # reposition the ship
     ship.rect.x = 50
     ship.rect.y = int(HEIGHT / 2)
+    ship.velocity = 0
+
+    # set the score to 0
     reset_score = 0
     return reset_score
 
@@ -103,7 +164,10 @@ class Rocket(pygame.sprite.Sprite):
             background_image = pygame.image.load(
                 r"space_sprites/text-1734188492127.png")
             background_image = pygame.transform.scale(background_image, (700, 200))
-            screen.blit(background_image, (WIDTH / 8, HEIGHT - 400))
+            b_image_width, b_image_height = background_image.get_size()
+            x_position = (WIDTH - b_image_width) / 2
+            y_position = (HEIGHT - b_image_height) / 2
+            screen.blit(background_image, (x_position, y_position))
 
 
 # obstacle class
@@ -197,11 +261,14 @@ ship = Rocket(100, int(HEIGHT / 2))
 rocket_group.add(ship)
 
 # create restart button
-button = Button(WIDTH // 2 - 50, HEIGHT - 140, button_image)
+image_width, image_height = button_image.get_size()
+x_pos = (WIDTH - image_width) / 2
+y_pos = (HEIGHT - image_height) / 2
+button = Button(x_pos, y_pos + 200, button_image)
 
 blaster_fired = False  # check if the blaster was shot
 run = True
-
+show_menu()
 while run:
     clock.tick(fps)
 
@@ -274,6 +341,10 @@ while run:
     for event in pygame.event.get():
         if event.type == QUIT:
             run = False
+        if event.type == KEYDOWN:
+            if event.key == K_p:
+                game_paused = True
+                show_menu()
 
         if event.type == KEYDOWN and flying == False and game_over == False:
             flying = True
